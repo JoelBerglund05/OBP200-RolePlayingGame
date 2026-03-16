@@ -75,36 +75,36 @@ class Program
         Console.Write("Val: ");
         var k = (Console.ReadLine() ?? "").Trim();
 
-        string cls = "Warrior";
-        int hp = 0, maxhp = 0, atk = 0, def = 0;
-        int potions = 0, gold = 0;
+        Type cls = typeof(Warrior);
+        // int hp = 0, maxhp = 0, atk = 0, def = 0;
+        // int potions = 0, gold = 0;
         
         switch (k)
         {
             case "1": // Warrior: tankig
-                cls = "Warrior";
-                maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
+                cls = typeof(Warrior);
+                // maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
+                player = new Warrior(name);
+                
                 break;
             case "2": // Mage: hög damage, låg def
-                cls = "Mage";
-                maxhp = 28; hp = 28; atk = 10; def = 2; potions = 2; gold = 15;
+                // cls = "Mage";
+                // maxhp = 28; hp = 28; atk = 10; def = 2; potions = 2; gold = 15;
+                player = new Mage(name);
                 break;
             case "3": // Rogue: krit-chans
-                cls = "Rogue";
-                maxhp = 32; hp = 32; atk = 8; def = 3; potions = 3; gold = 20;
+                // cls = "Rogue";
+                // maxhp = 32; hp = 32; atk = 8; def = 3; potions = 3; gold = 20;
                 break;
             default:
-                cls = "Warrior";
-                maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
+                // cls = "Warrior";
+                // maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
                 break;
         }
         
-        int xp = 0;
-        int level = 1;
-        string inventory = "Wooden Sword;Cloth Armor";
+        
 
         // Fyll player-array
-        player = new Player(name, cls, hp, maxhp, atk, def, gold, xp, level, potions, inventory);
         /*
         Player[0] = name;
         Player[1] = cls;
@@ -131,7 +131,7 @@ class Program
 
         CurrentRoomIndex = 0;
 
-        Console.WriteLine($"Välkommen, {name} the {cls}!");
+        Console.WriteLine($"Välkommen, {name} the {player.Cls}!");
         player.ShowStatus();
     }
 
