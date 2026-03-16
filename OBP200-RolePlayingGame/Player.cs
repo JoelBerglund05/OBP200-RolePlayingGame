@@ -1,95 +1,90 @@
 ﻿namespace OBP200_RolePlayingGame;
 
-public class Player
+public abstract class Player
 {
-    public Player(string name, string cls, int hp, int maxhp, int atk, int def, int gold, int xp, int level,
-        int potions, string inventory)
+    protected Player(string name)
     {
         Name = name;
-        Cls = cls ?? "Warrior";
-        Hp = hp;
-        Maxhp = maxhp;
-        Atk = atk;
-        Def = def;
-        Gold = gold;
-        Xp = xp;
-        Level = level;
-        Potions = potions;
-        Inventory = inventory;
+        Xp = 0;
+        Level = 1;
+        Inventory = "Wooden Sword;Cloth Armor";
     }
     
     public string Name
     {
-        private set;
+        protected set;
         get;
     }
     
     public int Hp
     {
-        private set;
+        protected set;
         get;
     }
     
     public int Maxhp
     {
-        private set;
+        protected set;
         get;
     }
 
     public int Atk
     {
-        private set;
+        protected set;
         get;
     }
 
     public int Def
     {
-        private set;
+        protected set;
         get;
     }
 
     public int Gold
     {
-        private set;
+        protected set;
         get;
     }
 
     public int Potions
     {
-        private set;
+        protected set;
         get;
     }
     
     public int Xp
     {
-        private set;
+        protected set;
         get;
     }
 
     public int Level
     {
-        private set;
+        protected set;
         get;
     }
 
     public string Cls
     {
-        private set;
+        protected set;
         get;
     }
 
     public string Inventory
     {
-        private set;
+        protected set;
         get;
     }
+    
+    protected int Buff { set; get; }
+    
 
     public void Rest()
     {
         Hp = Maxhp;
     }
-    
-    public int CalculateDamage(int enemyDef, Random Rng)
+
+    public virtual int CalculateDamage(int enemyDef, Random Rng)
     {
 
         // Beräkna grundskada
@@ -98,8 +93,8 @@ public class Player
 
         switch (Cls.Trim())
         {
-            case "Warrior":
-                baseDmg += 1; // warrior buff
+            case "DummaDIG":
+                baseDmg += 1; // DummaDIG buff
                 break;
             case "Mage":
                 baseDmg += 2; // mage buff
@@ -115,15 +110,15 @@ public class Player
         return Math.Max(1, baseDmg + roll);
     }
     
-    public int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng)
+    public virtual int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng)
     {
         int specialDmg = 0;
 
         // Hantering av specialförmågor
-        if (Cls == "Warrior")
+        if (Cls == "DummaDIG")
         {
             // Heavy Strike: hög skada men självskada
-            Console.WriteLine("Warrior använder Heavy Strike!");
+            Console.WriteLine("DummaDIG använder Heavy Strike!");
             specialDmg = Math.Max(2, Atk + 3 - enemyDef);
             ApplyDamage(2); // självskada
         }
@@ -229,12 +224,9 @@ public class Player
         Inventory = items.Count == 0 ? "" : string.Join(";", items);
     }
     
-    public void MaybeLevelUp()
+    public virtual void MaybeLevelUp()
     {
-        // Nivåtrösklar
-        int nextThreshold = Level == 1 ? 10 : (Level == 2 ? 25 : (Level == 3 ? 45 : Level * 20));
-
-        if (Xp >= nextThreshold)
+        if (Xp >= NextLevelThreshold())
         {
             Level += 1;
 
@@ -242,7 +234,7 @@ public class Player
 
             switch (Cls)
             {
-                case "Warrior":
+                case "DummaDIG":
                     Maxhp += 6; Atk += 2; Def += 2;
                     break;
                 case "Mage":
@@ -294,5 +286,10 @@ public class Player
         {
             Console.WriteLine($"Väska: {Inventory}");
         }
+    }
+
+    protected int NextLevelThreshold()
+    {
+        return Level == 1 ? 10 : (Level == 2 ? 25 : (Level == 3 ? 45 : Level * 20));
     }
 }
