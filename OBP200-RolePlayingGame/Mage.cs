@@ -50,8 +50,14 @@ public class Mage : Player
 
         return Math.Max(0, specialDmg);
     }
+    
+    public override bool TryRunAway(Random Rng)
+    {
+        double chance = 0.35; 
+        return (Rng.NextDouble() < chance);
+    }
 
-    public override void MaybeLevelUp()
+    protected override void MaybeLevelUp()
     {
         if (Xp >= NextLevelThreshold())
         {

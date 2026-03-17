@@ -44,7 +44,13 @@ public class Warrior : Player
         return Math.Max(0, specialDmg);
     }
     
-    public override void MaybeLevelUp()
+    public override bool TryRunAway(Random Rng)
+    {
+        double chance = 0.25; 
+        return (Rng.NextDouble() < chance);
+    }
+    
+    protected override void MaybeLevelUp()
     {
         if (Xp >= NextLevelThreshold())
         {
