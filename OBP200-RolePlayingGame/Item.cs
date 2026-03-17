@@ -2,7 +2,7 @@
 
 public enum Item
 {
-    potion,
-    wepon,
-    armor
+    Potion,
+    Wepon,
+    Armor
 }

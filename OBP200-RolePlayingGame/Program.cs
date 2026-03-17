@@ -353,15 +353,15 @@ class Program
 
             if (val == "1")
             {
-                player.TryBuy(10, Item.potion, "Du köper en dryck.");
+                player.TryBuy(10, Item.Potion, "Du köper en dryck.");
             }
             else if (val == "2")
             {
-                player.TryBuy(25, Item.wepon, "Du köper ett bättre vapen.");
+                player.TryBuy(25, Item.Wepon, "Du köper ett bättre vapen.");
             }
             else if (val == "3")
             {
-                player.TryBuy(25, Item.armor, "Du köper bättre rustning.");
+                player.TryBuy(25, Item.Armor, "Du köper bättre rustning.");
             }
             else if (val == "4")
             {

@@ -149,13 +149,13 @@ public abstract class Player
             Gold -= cost;
             switch (item)
             {
-                case Item.potion:
+                case Item.Potion:
                     Potions += 1;
                     break;
-                case Item.wepon:
+                case Item.Wepon:
                     Atk += 1;
                     break;
-                case Item.armor:
+                case Item.Armor:
                     Def += 2;
                     break;
                 default:
