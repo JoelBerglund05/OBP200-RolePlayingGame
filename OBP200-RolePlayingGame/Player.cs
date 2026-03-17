@@ -9,30 +9,6 @@ public abstract class Player
         Level = 1;
         Inventory = "Wooden Sword;Cloth Armor";
     }
-    
-    public string Name
-    {
-        protected set;
-        get;
-    }
-    
-    public int Hp
-    {
-        protected set;
-        get;
-    }
-    
-    public int Maxhp
-    {
-        protected set;
-        get;
-    }
-
-    public int Atk
-    {
-        protected set;
-        get;
-    }
 
     public int Def
     {
@@ -52,18 +28,6 @@ public abstract class Player
         get;
     }
     
-    public int Xp
-    {
-        protected set;
-        get;
-    }
-
-    public int Level
-    {
-        protected set;
-        get;
-    }
-
     public string Cls
     {
         protected set;
@@ -73,6 +37,42 @@ public abstract class Player
     public string Inventory
     {
         protected set;
+        get;
+    }
+    
+    private string Name
+    {
+        set;
+        get;
+    }
+    
+    protected int Hp
+    {
+        set;
+        get;
+    }
+    
+    protected int Maxhp
+    {
+        set;
+        get;
+    }
+
+    protected int Atk
+    {
+        set;
+        get;
+    }
+    
+    protected int Xp
+    {
+        set;
+        get;
+    }
+
+    protected int Level
+    {
+        set;
         get;
     }
     
@@ -113,7 +113,6 @@ public abstract class Player
         Console.WriteLine($"Du dricker en dryck och återfår {newHp - Hp} HP.");
         Hp = newHp;
     }
-
     
     public bool IsDead()
     {
