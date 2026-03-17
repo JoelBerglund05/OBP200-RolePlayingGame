@@ -75,14 +75,12 @@ class Program
         Console.Write("Val: ");
         var k = (Console.ReadLine() ?? "").Trim();
 
-        Type cls = typeof(Warrior);
         // int hp = 0, maxhp = 0, atk = 0, def = 0;
         // int potions = 0, gold = 0;
         
         switch (k)
         {
             case "1": // Warrior: tankig
-                cls = typeof(Warrior);
                 // maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
                 player = new Warrior(name);
                 
@@ -93,10 +91,12 @@ class Program
                 player = new Mage(name);
                 break;
             case "3": // Rogue: krit-chans
+                player = new Rogue(name);
                 // cls = "Rogue";
                 // maxhp = 32; hp = 32; atk = 8; def = 3; potions = 3; gold = 20;
                 break;
             default:
+                player = new Warrior(name);
                 // cls = "Warrior";
                 // maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
                 break;
