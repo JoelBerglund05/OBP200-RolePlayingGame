@@ -81,44 +81,19 @@ class Program
         switch (k)
         {
             case "1": // Warrior: tankig
-                // maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
                 player = new Warrior(name);
-                
                 break;
             case "2": // Mage: hög damage, låg def
-                // cls = "Mage";
-                // maxhp = 28; hp = 28; atk = 10; def = 2; potions = 2; gold = 15;
                 player = new Mage(name);
                 break;
             case "3": // Rogue: krit-chans
                 player = new Rogue(name);
-                // cls = "Rogue";
-                // maxhp = 32; hp = 32; atk = 8; def = 3; potions = 3; gold = 20;
                 break;
             default:
                 player = new Warrior(name);
-                // cls = "Warrior";
-                // maxhp = 40; hp = 40; atk = 7; def = 5; potions = 2; gold = 15;
                 break;
         }
         
-        
-
-        // Fyll player-array
-        /*
-        Player[0] = name;
-        Player[1] = cls;
-        Player[2] = hp.ToString();
-        Player[3] = maxhp.ToString();
-        Player[4] = atk.ToString();
-        Player[5] = def.ToString();
-        Player[6] = gold.ToString();
-        Player[7] = "0";   // XP
-        Player[8] = "1";   // LEVEL
-        Player[9] = potions.ToString();
-        Player[10] = "Wooden Sword;Cloth Armor";
-         */ // inventory som semicolon-separerad sträng
-
         // Initiera karta (linjärt äventyr)
         Rooms.Clear();
         Rooms.Add(new[] { "battle", "Skogsstig" });
@@ -313,11 +288,7 @@ class Program
         EnemyTemplates.Add(new[] { "bandit", "Bandit", "16", "6", "1", "8", "6" });
         EnemyTemplates.Add(new[] { "slime", "Geléslem", "14", "3", "0", "5", "3" });
     }
-
     
-
-    
-
     static int CalculateEnemyDamage(int enemyAtk)
     {
         int def = player.Def;
@@ -408,9 +379,7 @@ class Program
         }
         return true;
     }
-
     
-
     static void SellMinorGems()
     {
         if (string.IsNullOrWhiteSpace(player.Inventory))
