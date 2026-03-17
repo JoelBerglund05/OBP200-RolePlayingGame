@@ -357,7 +357,7 @@ class Program
             }
             else if (val == "2")
             {
-                player.TryBuy(25, Item.Wepon, "Du köper ett bättre vapen.");
+                player.TryBuy(25, Item.Weapon, "Du köper ett bättre vapen.");
             }
             else if (val == "3")
             {

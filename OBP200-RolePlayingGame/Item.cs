@@ -3,6 +3,6 @@
 public enum Item
 {
     Potion,
-    Wepon,
+    Weapon,
     Armor
 }

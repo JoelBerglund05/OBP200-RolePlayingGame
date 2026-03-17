@@ -152,7 +152,7 @@ public abstract class Player
                 case Item.Potion:
                     Potions += 1;
                     break;
-                case Item.Wepon:
+                case Item.Weapon:
                     Atk += 1;
                     break;
                 case Item.Armor:
