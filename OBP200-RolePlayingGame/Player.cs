@@ -84,86 +84,13 @@ public abstract class Player
         Hp = Maxhp;
     }
 
-    public virtual int CalculateDamage(int enemyDef, Random Rng)
-    {
+    public abstract int CalculateDamage(int enemyDef, Random Rng);
 
-        // Beräkna grundskada
-        int baseDmg = Math.Max(1, Atk - (enemyDef / 2));
-        int roll = Rng.Next(0, 3); // liten variation
-
-        switch (Cls.Trim())
-        {
-            case "DummaDIG":
-                baseDmg += 1; // DummaDIG buff
-                break;
-            case "Mage":
-                baseDmg += 2; // mage buff
-                break;
-            case "Rogue":
-                baseDmg += (Rng.NextDouble() < 0.2) ? 4 : 0; // rogue crit-chans
-                break;
-            default:
-                baseDmg += 0;
-                break;
-        }
-
-        return Math.Max(1, baseDmg + roll);
-    }
+    public abstract int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng);
     
-    public virtual int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng)
-    {
-        int specialDmg = 0;
-
-        // Hantering av specialförmågor
-        if (Cls == "DummaDIG")
-        {
-            // Heavy Strike: hög skada men självskada
-            Console.WriteLine("DummaDIG använder Heavy Strike!");
-            specialDmg = Math.Max(2, Atk + 3 - enemyDef);
-            ApplyDamage(2); // självskada
-        }
-        else if (Cls == "Mage")
-        {
-            // Fireball: stor skada, kostar guld
-            if (Gold >= 3)
-            {
-                Console.WriteLine("Mage kastar Fireball!");
-                Gold -= 3;
-                specialDmg = Math.Max(3, Atk + 5 - (enemyDef / 2));
-            }
-            else
-            {
-                Console.WriteLine("Inte tillräckligt med guld för att kasta Fireball (kostar 3).");
-                specialDmg = 0;
-            }
-        }
-        else if (Cls == "Rogue")
-        {
-            // Backstab: chans att ignorera försvar, hög risk/hög belöning
-            if (Rng.NextDouble() < 0.5)
-            {
-                Console.WriteLine("Rogue utför en lyckad Backstab!");
-                specialDmg = Math.Max(4, Atk + 6);
-            }
-            else
-            {
-                Console.WriteLine("Backstab misslyckades!");
-                specialDmg = 1;
-            }
-        }
-        else
-        {
-            specialDmg = 0;
-        }
-
-        // Dämpa skada mot bossen
-        if (vsBoss)
-        {
-            specialDmg = (int)Math.Round(specialDmg * 0.8);
-        }
-
-        return Math.Max(0, specialDmg);
-    }
+    public abstract bool TryRunAway(Random Rng);
+    
+    protected abstract void MaybeLevelUp();
     
     public void ApplyDamage(int dmg)
     {
@@ -186,15 +113,7 @@ public abstract class Player
         Console.WriteLine($"Du dricker en dryck och återfår {newHp - Hp} HP.");
         Hp = newHp;
     }
-    
-    public bool TryRunAway(Random Rng)
-    {
-        // Flyktschans baserad på karaktärsklass
-        double chance = 0.25;
-        if (Cls == "Rogue") chance = 0.5;
-        if (Cls == "Mage") chance = 0.35;
-        return Rng.NextDouble() < chance;
-    }
+
     
     public bool IsDead()
     {
@@ -222,34 +141,6 @@ public abstract class Player
     {
         items = items.Where(x => x != "Minor Gem").ToList();
         Inventory = items.Count == 0 ? "" : string.Join(";", items);
-    }
-    
-    public virtual void MaybeLevelUp()
-    {
-        if (Xp >= NextLevelThreshold())
-        {
-            Level += 1;
-
-            // Uppgradering baserad på karaktärsklass
-
-            switch (Cls)
-            {
-                case "DummaDIG":
-                    Maxhp += 6; Atk += 2; Def += 2;
-                    break;
-                case "Mage":
-                    Maxhp += 4; Atk += 4; Def += 1;
-                    break;
-                case "Rogue":
-                    Maxhp += 5; Atk += 3; Def += 1;
-                    break;
-                default:
-                    Maxhp += 4; Atk += 3; Def += 1;
-                    break;
-            }
-
-            Console.WriteLine($"Du når nivå {Level}! Värden ökade och HP återställd.");
-        }
     }
     
     public void TryBuy(int cost, Item item, string successMsg)
