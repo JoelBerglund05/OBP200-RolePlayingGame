@@ -77,6 +77,8 @@ public abstract class Player
     }
     
     protected int Buff { set; get; }
+
+    protected double Chance { set; get; } = 0.25;
     
 
     public void Rest()
@@ -88,9 +90,12 @@ public abstract class Player
 
     public abstract int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng);
     
-    public abstract bool TryRunAway(Random Rng);
-    
     protected abstract void MaybeLevelUp();
+    
+    public bool TryRunAway( Random Rng)
+    {
+        return (Rng.NextDouble() < Chance);
+    }
     
     public void ApplyDamage(int dmg)
     {

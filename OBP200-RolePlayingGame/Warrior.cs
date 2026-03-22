@@ -13,6 +13,7 @@ public class Warrior : Player
         Gold = 15;
         Buff = 1;
         Cls = "Warrior";
+        Chance = 0.25;
     }
 
     public override int CalculateDamage(int enemyDef, Random Rng)
@@ -42,12 +43,6 @@ public class Warrior : Player
         }
         
         return Math.Max(0, specialDmg);
-    }
-    
-    public override bool TryRunAway(Random Rng)
-    {
-        double chance = 0.25; 
-        return (Rng.NextDouble() < chance);
     }
     
     protected override void MaybeLevelUp()

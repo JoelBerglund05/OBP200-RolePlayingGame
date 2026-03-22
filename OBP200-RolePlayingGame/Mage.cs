@@ -12,8 +12,9 @@ public class Mage : Player
         Gold = 15;
         Buff = 2;
         Cls = "Mage";
+        Chance = 0.35;
     }
-
+    
     public override int CalculateDamage(int enemyDef, Random Rng)
     {
         // Beräkna grundskada
@@ -51,12 +52,6 @@ public class Mage : Player
         return Math.Max(0, specialDmg);
     }
     
-    public override bool TryRunAway(Random Rng)
-    {
-        double chance = 0.35; 
-        return (Rng.NextDouble() < chance);
-    }
-
     protected override void MaybeLevelUp()
     {
         if (Xp >= NextLevelThreshold())
