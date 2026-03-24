@@ -10,7 +10,7 @@ public abstract class Player
         Inventory = "Wooden Sword;Cloth Armor";
     }
 
-    public int Def
+    public int Defense
     {
         protected set;
         get;
@@ -28,7 +28,7 @@ public abstract class Player
         get;
     }
     
-    public string Cls
+    public string ClassType
     {
         protected set;
         get;
@@ -58,7 +58,7 @@ public abstract class Player
         get;
     }
 
-    protected int Atk
+    protected int Attack
     {
         set;
         get;
@@ -86,9 +86,9 @@ public abstract class Player
         Hp = Maxhp;
     }
 
-    public abstract int CalculateDamage(int enemyDef, Random Rng);
+    public abstract int CalculateDamage(int enemyDefense, Random Rng);
 
-    public abstract int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng);
+    public abstract int UseClassSpecial(int enemyDefense, bool vsBoss, Random Rng);
     
     protected abstract void MaybeLevelUp();
     
@@ -158,12 +158,12 @@ public abstract class Player
                     Potions += 1;
                     break;
                 case Item.Weapon:
-                    Atk += 1;
+                    Attack += 1;
                     break;
                 case Item.Armor:
-                    Def += 2;
+                    Defense += 2;
                     break;
-                default:
+                Defenseault:
                     break;
             }
             Console.WriteLine(successMsg);
@@ -176,7 +176,7 @@ public abstract class Player
     
     public void ShowStatus()
     {
-        Console.WriteLine($"[{Name} | {Cls}]  HP {Hp}/{Maxhp}  ATK {Atk}  DEF {Def}  LVL {Level}  XP {Xp}  Guld {Gold}  Drycker {Potions}");
+        Console.WriteLine($"[{Name} | {ClassType}]  HP {Hp}/{Maxhp}  Attack {Attack}  Defense {Defense}  LVL {Level}  XP {Xp}  Guld {Gold}  Drycker {Potions}");
         if (!string.IsNullOrWhiteSpace(Inventory))
         {
             Console.WriteLine($"Väska: {Inventory}");

@@ -6,26 +6,26 @@ public class Rogue : Player
     {
         Maxhp = 32;
         Hp = Maxhp;
-        Atk = 8;
-        Def = 3;
+        Attack = 8;
+        Defense = 3;
         Potions = 3;
         Gold = 20;
         Buff = 0;
-        Cls = "Rogue";
+        ClassType = "Rogue";
         Chance = 0.5;
     }
 
-    public override int CalculateDamage(int enemyDef, Random Rng)
+    public override int CalculateDamage(int enemyDefense, Random Rng)
     {
         // Beräkna grundskada
-        int baseDmg = Math.Max(1, Atk - (enemyDef / 2));
+        int baseDmg = Math.Max(1, Attack - (enemyDefense / 2));
         int roll = Rng.Next(0, 3); // liten variation
         
         baseDmg += (Rng.NextDouble() < 0.2) ? 4 : 0; // rogue crit-chans
         return Math.Max(1, baseDmg + roll);
     }
 
-    public override int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng)
+    public override int UseClassSpecial(int enemyDefense, bool vsBoss, Random Rng)
     {
         int specialDmg = 0;
         
@@ -33,7 +33,7 @@ public class Rogue : Player
         if (Rng.NextDouble() < 0.5)
         {
             Console.WriteLine("Rogue utför en lyckad Backstab!");
-            specialDmg = Math.Max(4, Atk + 6);
+            specialDmg = Math.Max(4, Attack + 6);
         }
         else
         {
@@ -55,7 +55,7 @@ public class Rogue : Player
         if (Xp >= NextLevelThreshold())
         {
             Level++;
-            Maxhp += 5; Atk += 3; Def += 1;
+            Maxhp += 5; Attack += 3; Defense += 1;
             Console.WriteLine($"Du når nivå {Level}! Värden ökade och HP återställd.");
         }
     }

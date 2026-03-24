@@ -8,14 +8,14 @@ class Program
     // ======= Globalt tillstånd  =======
 
     // Spelarens "databas": alla värden som strängar
-    // index: 0 Name, 1 Class, 2 HP, 3 MaxHP, 4 ATK, 5 DEF, 6 GOLD, 7 XP, 8 LEVEL, 9 POTIONS, 10 INVENTORY (semicolon-sep)
+    // index: 0 Name, 1 Class, 2 HP, 3 MaxHP, 4 Attack, 5 Defense, 6 GOLD, 7 XP, 8 LEVEL, 9 POTIONS, 10 INVENTORY (semicolon-sep)
     private static Player player;
 
     // Rum: [type, label]
     // types: battle, treasure, shop, rest, boss
     static List<string[]> Rooms = new List<string[]>();
 
-    // Fiendemallar: [type, name, HP, ATK, DEF, XPReward, GoldReward]
+    // Fiendemallar: [type, name, HP, Attack, Defense, XPReward, GoldReward]
     static List<string[]> EnemyTemplates = new List<string[]>();
 
     // Status för kartan
@@ -75,7 +75,7 @@ class Program
         Console.Write("Val: ");
         var k = (Console.ReadLine() ?? "").Trim();
 
-        // int hp = 0, maxhp = 0, atk = 0, def = 0;
+        // int hp = 0, maxhp = 0, Attack = 0, Defense = 0;
         // int potions = 0, gold = 0;
         
         switch (k)
@@ -83,13 +83,13 @@ class Program
             case "1": // Warrior: tankig
                 player = new Warrior(name);
                 break;
-            case "2": // Mage: hög damage, låg def
+            case "2": // Mage: hög damage, låg Defense
                 player = new Mage(name);
                 break;
             case "3": // Rogue: krit-chans
                 player = new Rogue(name);
                 break;
-            default:
+            Defenseault:
                 player = new Warrior(name);
                 break;
         }
@@ -106,7 +106,7 @@ class Program
 
         CurrentRoomIndex = 0;
 
-        Console.WriteLine($"Välkommen, {name} the {player.Cls}!");
+        Console.WriteLine($"Välkommen, {name} the {player.ClassType}!");
         player.ShowStatus();
     }
 
@@ -182,11 +182,11 @@ class Program
     static bool DoBattle(bool isBoss)
     {
         var enemy = GenerateEnemy(isBoss);
-        Console.WriteLine($"En {enemy[1]} dyker upp! (HP {enemy[2]}, ATK {enemy[3]}, DEF {enemy[4]})");
+        Console.WriteLine($"En {enemy[1]} dyker upp! (HP {enemy[2]}, Attack {enemy[3]}, Defense {enemy[4]})");
 
         int enemyHp = ParseInt(enemy[2], 10);
-        int enemyAtk = ParseInt(enemy[3], 3);
-        int enemyDef = ParseInt(enemy[4], 0);
+        int enemyAttack = ParseInt(enemy[3], 3);
+        int enemyDefense = ParseInt(enemy[4], 0);
 
         while (enemyHp > 0 && !player.IsDead())
         {
@@ -201,13 +201,13 @@ class Program
 
             if (cmd == "A")
             {
-                int damage = player.CalculateDamage(enemyDef, Rng);
+                int damage = player.CalculateDamage(enemyDefense, Rng);
                 enemyHp -= damage;
                 Console.WriteLine($"Du slog {enemy[1]} för {damage} skada.");
             }
             else if (cmd == "X")
             {
-                int special = player.UseClassSpecial(enemyDef, isBoss, Rng);
+                int special = player.UseClassSpecial(enemyDefense, isBoss, Rng);
                 enemyHp -= special;
                 Console.WriteLine($"Special! {enemy[1]} tar {special} skada.");
             }
@@ -235,7 +235,7 @@ class Program
             if (enemyHp <= 0) break;
 
             // Fiendens tur
-            int enemyDamage = CalculateEnemyDamage(enemyAtk);
+            int enemyDamage = CalculateEnemyDamage(enemyAttack);
             player.ApplyDamage(enemyDamage);
             Console.WriteLine($"{enemy[1]} anfaller och gör {enemyDamage} skada!");
         }
@@ -272,11 +272,11 @@ class Program
             
             // Slmumpmässig justering av stats
             int hp = ParseInt(template[2], 10) + Rng.Next(-1, 3);
-            int atk = ParseInt(template[3], 3) + Rng.Next(0, 2);
-            int def = ParseInt(template[4], 0) + Rng.Next(0, 2);
+            int Attack = ParseInt(template[3], 3) + Rng.Next(0, 2);
+            int Defense = ParseInt(template[4], 0) + Rng.Next(0, 2);
             int xp = ParseInt(template[5], 4) + Rng.Next(0, 3);
             int gold = ParseInt(template[6], 2) + Rng.Next(0, 3);
-            return new[] { template[0], template[1], hp.ToString(), atk.ToString(), def.ToString(), xp.ToString(), gold.ToString() };
+            return new[] { template[0], template[1], hp.ToString(), Attack.ToString(), Defense.ToString(), xp.ToString(), gold.ToString() };
         }
     }
 
@@ -289,12 +289,12 @@ class Program
         EnemyTemplates.Add(new[] { "slime", "Geléslem", "14", "3", "0", "5", "3" });
     }
     
-    static int CalculateEnemyDamage(int enemyAtk)
+    static int CalculateEnemyDamage(int enemyAttack)
     {
-        int def = player.Def;
+        int Defense = player.Defense;
         int roll = Rng.Next(0, 3);
 
-        int dmg = Math.Max(1, enemyAtk - (def / 2)) + roll;
+        int dmg = Math.Max(1, enemyAttack - (Defense / 2)) + roll;
 
         // Liten chans till "glancing blow" (minskad skada)
         if (Rng.NextDouble() < 0.1) dmg = Math.Max(1, dmg - 2);
@@ -344,8 +344,8 @@ class Program
         {
             Console.WriteLine($"Guld: {player.Gold} | Drycker: {player.Potions}");
             Console.WriteLine("1) Köp dryck (10 guld)");
-            Console.WriteLine("2) Köp vapen (+2 ATK) (25 guld)");
-            Console.WriteLine("3) Köp rustning (+2 DEF) (25 guld)");
+            Console.WriteLine("2) Köp vapen (+2 Attack) (25 guld)");
+            Console.WriteLine("3) Köp rustning (+2 Defense) (25 guld)");
             Console.WriteLine("4) Sälj alla 'Minor Gem' (+5 guld/st)");
             Console.WriteLine("5) Lämna butiken");
             Console.Write("Val: ");  

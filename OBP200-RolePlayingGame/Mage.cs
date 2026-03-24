@@ -6,19 +6,19 @@ public class Mage : Player
     {
         Maxhp = 28;
         Hp = Maxhp;
-        Atk = 10;
-        Def = 2;
+        Attack = 10;
+        Defense = 2;
         Potions = 2;
         Gold = 15;
         Buff = 2;
-        Cls = "Mage";
+        ClassType = "Mage";
         Chance = 0.35;
     }
     
-    public override int CalculateDamage(int enemyDef, Random Rng)
+    public override int CalculateDamage(int enemyDefense, Random Rng)
     {
         // Beräkna grundskada
-        int baseDmg = Math.Max(1, Atk - (enemyDef / 2));
+        int baseDmg = Math.Max(1, Attack - (enemyDefense / 2));
         int roll = Rng.Next(0, 3); // liten variation
         
         baseDmg += Buff;
@@ -26,7 +26,7 @@ public class Mage : Player
         return Math.Max(1, baseDmg + roll);
     }
 
-    public override int UseClassSpecial(int enemyDef, bool vsBoss, Random Rng)
+    public override int UseClassSpecial(int enemyDefense, bool vsBoss, Random Rng)
     {
         int specialDmg = 0;
         
@@ -35,7 +35,7 @@ public class Mage : Player
         {
             Console.WriteLine("Mage kastar Fireball!");
             Gold -= 3;
-            specialDmg = Math.Max(3, Atk + 5 - (enemyDef / 2));
+            specialDmg = Math.Max(3, Attack + 5 - (enemyDefense / 2));
         }
         else
         {
@@ -57,7 +57,7 @@ public class Mage : Player
         if (Xp >= NextLevelThreshold())
         {
             Level++;
-            Maxhp += 4; Atk += 4; Def += 1;
+            Maxhp += 4; Attack += 4; Defense += 1;
             Console.WriteLine($"Du når nivå {Level}! Värden ökade och HP återställd.");
         }
     }
