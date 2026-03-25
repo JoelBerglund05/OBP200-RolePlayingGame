@@ -158,7 +158,7 @@ public abstract class Player
                     Potions += 1;
                     break;
                 case Item.Weapon:
-                    Attack += 1;
+                    Attack += 2;
                     break;
                 case Item.Armor:
                     Defense += 2;
