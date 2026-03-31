@@ -1,25 +1,16 @@
-﻿namespace OBP200_RolePlayingGame.Player;
+﻿using OBP200_RolePlayingGame.Character;
+using OBP200_RolePlayingGame.Inventory.InventoryItem;
 
-public abstract class Player
+namespace OBP200_RolePlayingGame.Player;
+
+public abstract class Player : IAddLoot, IAttacker, IDefender
 {
-    protected Player(string name)
+    protected CharacterStats stats;
+    
+    protected Player()
     {
-        Name = name;
-        Xp = 0;
         Level = 1;
         Inventory = new Inventory.Inventory();
-    }
-
-    public int Defense
-    {
-        protected set;
-        get;
-    }
-
-    public int Gold
-    {
-        protected set;
-        get;
     }
 
     public int Potions
@@ -36,37 +27,7 @@ public abstract class Player
 
     public Inventory.Inventory Inventory
     {
-        protected set;
-        get;
-    }
-    
-    private string Name
-    {
-        set;
-        get;
-    }
-    
-    protected int Hp
-    {
-        set;
-        get;
-    }
-    
-    protected int Maxhp
-    {
-        set;
-        get;
-    }
-
-    protected int Attack
-    {
-        set;
-        get;
-    }
-    
-    protected int Xp
-    {
-        set;
+        private set;
         get;
     }
 
@@ -79,15 +40,38 @@ public abstract class Player
     protected int Buff { set; get; }
 
     protected double Chance { set; get; } = 0.25;
-    
+
+    public int GetGold()
+    {
+        return stats.Gold;
+    }
+
+    public void AddLoot(Item item)
+    {
+        Inventory.AddItem(item);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        stats.TakeDamage(damage);
+    }
 
     public void Rest()
     {
-        Hp = Maxhp;
+        stats.ResetHp();
     }
 
-    public abstract int CalculateDamage(int enemyDefense, Random Rng);
+    public virtual int CalculateDamage(Random Rng)
+    {
+        // Beräkna grundskada
+        int baseDmg = Math.Max(1, stats.Attack);
+        int roll = Rng.Next(0, 3); // liten variation
 
+        baseDmg += Buff;
+        
+        return Math.Max(1, baseDmg + roll);
+    }
+    
     public abstract int UseClassSpecial(int enemyDefense, bool vsBoss, Random Rng);
     
     protected abstract void MaybeLevelUp();
@@ -95,11 +79,6 @@ public abstract class Player
     public bool TryRunAway(Random Rng)
     {
         return (Rng.NextDouble() < Chance);
-    }
-    
-    public void ApplyDamage(int dmg)
-    {
-        Hp -= Math.Max(0, dmg);
     }
     
     public void UsePotion()
@@ -112,44 +91,43 @@ public abstract class Player
 
         // Helning av spelaren
         int heal = 12;
-        int newHp = Math.Min(Maxhp, Hp + heal);
         Potions -= 1;
 
-        Console.WriteLine($"Du dricker en dryck och återfår {newHp - Hp} HP.");
-        Hp = newHp;
+        Console.WriteLine($"Du dricker en dryck och återfår {heal} HP.");
+        stats.AddHp(heal);
     }
     
     public bool IsDead()
     {
-        return Hp <= 0;
+        return stats.Hp <= 0;
     }
 
     public void AddXp(int amount)
     {
-        Xp += Math.Max(0, amount);
+        stats.AddXp(amount);
         MaybeLevelUp();
     }
 
     public void AddGold(int amount)
     {
-        Gold += Math.Max(0, amount);
+        stats.AddGold(amount);
     }
     
     public void TryBuy(int cost, ShopItem shopItem, string successMsg)
     {
-        if (Gold >= cost)
+        if (stats.Gold >= cost)
         {
-            Gold -= cost;
+            stats.RemoveGold(cost);
             switch (shopItem)
             {
                 case ShopItem.Potion:
                     Potions += 1;
                     break;
                 case ShopItem.Weapon:
-                    Attack += 2;
+                    // Attack += 2;
                     break;
                 case ShopItem.Armor:
-                    Defense += 2;
+                    // Defense += 2;
                     break;
                 Default:
                     break;
@@ -164,7 +142,7 @@ public abstract class Player
     
     public void ShowStatus()
     {
-        Console.WriteLine($"[{Name} | {ClassType}]  HP {Hp}/{Maxhp}  Attack {Attack}  Defense {Defense}  LVL {Level}  XP {Xp}  Guld {Gold}  Drycker {Potions}");
+        Console.WriteLine($"[{stats.Name} | {ClassType}]  HP {stats.Hp}/{stats.MaxHp}  Attack {stats.Attack}  Defense {stats.Defense}  LVL {Level}  XP {stats.Xp}  Guld {stats.Gold}  Drycker {Potions}");
         Inventory.ViewInventory();
     }
 
