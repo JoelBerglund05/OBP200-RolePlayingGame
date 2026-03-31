@@ -1,29 +1,24 @@
-﻿namespace OBP200_RolePlayingGame.Player.PlayableClassTypes;
+﻿using OBP200_RolePlayingGame.Character;
+
+namespace OBP200_RolePlayingGame.Player.PlayableClassTypes;
 
 public class Mage : Player
 {
-    public Mage(string name) : base(name)
+    public Mage(string name) : base()
     {
-        Maxhp = 28;
-        Hp = Maxhp;
-        Attack = 10;
-        Defense = 2;
+        int maxhp = 28;
+        int attack = 10;
+        int defense = 2;
+        int gold = 15;
+        int xp = 0;
+        
+        stats = new CharacterStats(maxhp, attack, defense, xp, gold, name);
+        
+        
         Potions = 2;
-        Gold = 15;
         Buff = 2;
         ClassType = "Mage";
         Chance = 0.35;
-    }
-    
-    public override int CalculateDamage(int enemyDefense, Random Rng)
-    {
-        // Beräkna grundskada
-        int baseDmg = Math.Max(1, Attack - (enemyDefense / 2));
-        int roll = Rng.Next(0, 3); // liten variation
-        
-        baseDmg += Buff;
-        
-        return Math.Max(1, baseDmg + roll);
     }
 
     public override int UseClassSpecial(int enemyDefense, bool vsBoss, Random Rng)
@@ -31,11 +26,11 @@ public class Mage : Player
         int specialDmg = 0;
         
         // Fireball: stor skada, kostar guld
-        if (Gold >= 3)
+        if (stats.Gold >= 3)
         {
             Console.WriteLine("Mage kastar Fireball!");
-            Gold -= 3;
-            specialDmg = Math.Max(3, Attack + 5 - (enemyDefense / 2));
+            stats.RemoveGold(3);
+            specialDmg = Math.Max(3, stats.Attack + 5);
         }
         else
         {
@@ -54,10 +49,10 @@ public class Mage : Player
     
     protected override void MaybeLevelUp()
     {
-        if (Xp >= NextLevelThreshold())
+        if (stats.Xp >= NextLevelThreshold())
         {
             Level++;
-            Maxhp += 4; Attack += 4; Defense += 1;
+            stats.AddMaxHp(4);
             Console.WriteLine($"Du når nivå {Level}! Värden ökade och HP återställd.");
         }
     }

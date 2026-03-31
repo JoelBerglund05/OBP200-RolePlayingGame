@@ -1,27 +1,33 @@
-﻿namespace OBP200_RolePlayingGame.Player.PlayableClassTypes;
+﻿using OBP200_RolePlayingGame.Character;
+
+namespace OBP200_RolePlayingGame.Player.PlayableClassTypes;
 
 public class Rogue : Player
 {
-    public Rogue(string name) : base(name)
+    public Rogue(string name) : base()
     {
-        Maxhp = 32;
-        Hp = Maxhp;
-        Attack = 8;
-        Defense = 3;
+        int maxhp = 32;
+        int attack = 8;
+        int defense = 3;
+        int gold = 20;
+        int xp = 0;
+        
+        stats = new CharacterStats(maxhp, attack, defense, xp, gold, name);
+        
         Potions = 3;
-        Gold = 20;
         Buff = 0;
         ClassType = "Rogue";
         Chance = 0.5;
     }
 
-    public override int CalculateDamage(int enemyDefense, Random Rng)
+    public override int CalculateDamage(Random Rng)
     {
         // Beräkna grundskada
-        int baseDmg = Math.Max(1, Attack - (enemyDefense / 2));
+        int baseDmg = Math.Max(1, stats.Attack);
         int roll = Rng.Next(0, 3); // liten variation
         
         baseDmg += (Rng.NextDouble() < 0.2) ? 4 : 0; // rogue crit-chans
+        
         return Math.Max(1, baseDmg + roll);
     }
 
@@ -33,7 +39,7 @@ public class Rogue : Player
         if (Rng.NextDouble() < 0.5)
         {
             Console.WriteLine("Rogue utför en lyckad Backstab!");
-            specialDmg = Math.Max(4, Attack + 6);
+            specialDmg = Math.Max(4, stats.Attack + 6);
         }
         else
         {
@@ -52,10 +58,10 @@ public class Rogue : Player
     
     protected override void MaybeLevelUp()
     {
-        if (Xp >= NextLevelThreshold())
+        if (stats.Xp >= NextLevelThreshold())
         {
             Level++;
-            Maxhp += 5; Attack += 3; Defense += 1;
+            stats.AddMaxHp(5);
             Console.WriteLine($"Du når nivå {Level}! Värden ökade och HP återställd.");
         }
     }
