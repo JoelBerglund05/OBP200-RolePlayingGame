@@ -4,7 +4,5 @@ namespace OBP200_RolePlayingGame.Character;
 
 public interface IAttacker
 {
-    int Attack { get; set; }
-    
-    void CalculateDamage(Random random);
+    int CalculateDamage(Random random);
 }
