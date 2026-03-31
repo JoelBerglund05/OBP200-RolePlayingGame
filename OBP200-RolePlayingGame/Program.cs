@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using OBP200_RolePlayingGame.Character.Enemy;
 using OBP200_RolePlayingGame.Inventory.InventoryItem;
 using OBP200_RolePlayingGame.Inventory.InventoryItem.Components.ComponentInterfaces;
 using OBP200_RolePlayingGame.Player.PlayableClassTypes;
@@ -19,7 +20,7 @@ class Program
     static List<string[]> Rooms = new List<string[]>();
 
     // Fiendemallar: [type, name, HP, Attack, Defense, XPReward, GoldReward]
-    static List<string[]> EnemyTemplates = new List<string[]>();
+    static List<Enemy> enemies = new List<Enemy>();
 
     // Status för kartan
     static int CurrentRoomIndex = 0;
@@ -185,17 +186,17 @@ class Program
     static bool DoBattle(bool isBoss)
     {
         var enemy = GenerateEnemy(isBoss);
-        Console.WriteLine($"En {enemy[1]} dyker upp! (HP {enemy[2]}, Attack {enemy[3]}, Defense {enemy[4]})");
+        Console.WriteLine($"En {enemy.GetName()} dyker upp! (HP {enemy.GetHp()}, Attack {enemy.GetAttack()}, Defense {enemy.GetDefense()})");
 
-        int enemyHp = ParseInt(enemy[2], 10);
-        int enemyAttack = ParseInt(enemy[3], 3);
-        int enemyDefense = ParseInt(enemy[4], 0);
+        int enemyHp = enemy.GetHp();
+        int enemyAttack = enemy.GetAttack();
+        int enemyDefense = enemy.GetDefense();
 
         while (enemyHp > 0 && !player.IsDead())
         {
             Console.WriteLine();
             player.ShowStatus();
-            Console.WriteLine($"Fiende: {enemy[1]} HP={enemyHp}");
+            Console.WriteLine($"Fiende: {enemy.GetName()} HP={enemyHp}");
             Console.WriteLine("[A] Attack   [X] Special   [P] Dryck   [R] Fly");
             if (isBoss) Console.WriteLine("(Du kan inte fly från en boss!)");
             Console.Write("Val: ");
@@ -204,15 +205,15 @@ class Program
 
             if (cmd == "A")
             {
-                int damage = player.CalculateDamage(enemyDefense, Rng);
+                int damage = player.CalculateDamage(Rng);
                 enemyHp -= damage;
-                Console.WriteLine($"Du slog {enemy[1]} för {damage} skada.");
+                Console.WriteLine($"Du slog {enemy.GetName()} för {damage} skada.");
             }
             else if (cmd == "X")
             {
                 int special = player.UseClassSpecial(enemyDefense, isBoss, Rng);
                 enemyHp -= special;
-                Console.WriteLine($"Special! {enemy[1]} tar {special} skada.");
+                Console.WriteLine($"Special! {enemy.GetName()} tar {special} skada.");
             }
             else if (cmd == "P")
             {
@@ -238,9 +239,9 @@ class Program
             if (enemyHp <= 0) break;
 
             // Fiendens tur
-            int enemyDamage = CalculateEnemyDamage(enemyAttack);
-            player.ApplyDamage(enemyDamage);
-            Console.WriteLine($"{enemy[1]} anfaller och gör {enemyDamage} skada!");
+            int enemyDamage = enemy.CalculateDamage(Rng);
+            player.TakeDamage(enemyDamage);
+            Console.WriteLine($"{enemy.GetName()} anfaller och gör {enemyDamage} skada!");
         }
 
         if (player.IsDead())
@@ -249,74 +250,41 @@ class Program
         }
 
         // Vinstrapporter, XP, guld, loot
-        int xpReward = ParseInt(enemy[5], 5);
-        int goldReward = ParseInt(enemy[6], 3);
+        int xpReward = enemy.GetXpReward();
+        int goldReward = enemy.GetGoldReward();
 
         player.AddXp(xpReward);
         player.AddGold(goldReward);
 
         Console.WriteLine($"Seger! +{xpReward} XP, +{goldReward} guld.");
-        MaybeDropLoot(enemy[1]);
+        enemy.MaybeDropLoot(player, Rng);
 
         return true;
     }
 
-    static string[] GenerateEnemy(bool isBoss)
+    static Enemy GenerateEnemy(bool isBoss)
     {
         if (isBoss)
         {
             // Boss-mall
-            return new[] { "boss", "Urdraken", "55", "9", "4", "30", "50" };
+            return new Enemy(55, 9, 4, 30, 50, "boss", "Urdraken", Rng);
         }
         else
         {
             // Slumpa bland templates
-            var template = EnemyTemplates[Rng.Next(EnemyTemplates.Count)];
+            var template = enemies[Rng.Next(enemies.Count)];
             
-            // Slmumpmässig justering av stats
-            int hp = ParseInt(template[2], 10) + Rng.Next(-1, 3);
-            int Attack = ParseInt(template[3], 3) + Rng.Next(0, 2);
-            int Defense = ParseInt(template[4], 0) + Rng.Next(0, 2);
-            int xp = ParseInt(template[5], 4) + Rng.Next(0, 3);
-            int gold = ParseInt(template[6], 2) + Rng.Next(0, 3);
-            return new[] { template[0], template[1], hp.ToString(), Attack.ToString(), Defense.ToString(), xp.ToString(), gold.ToString() };
+            return template;
         }
     }
 
     static void InitEnemyTemplates()
     {
-        EnemyTemplates.Clear();
-        EnemyTemplates.Add(new[] { "beast", "Vildsvin", "18", "4", "1", "6", "4" });
-        EnemyTemplates.Add(new[] { "undead", "Skelett", "20", "5", "2", "7", "5" });
-        EnemyTemplates.Add(new[] { "bandit", "Bandit", "16", "6", "1", "8", "6" });
-        EnemyTemplates.Add(new[] { "slime", "Geléslem", "14", "3", "0", "5", "3" });
-    }
-    
-    static int CalculateEnemyDamage(int enemyAttack)
-    {
-        int Defense = player.Defense;
-        int roll = Rng.Next(0, 3);
-
-        int dmg = Math.Max(1, enemyAttack - (Defense / 2)) + roll;
-
-        // Liten chans till "glancing blow" (minskad skada)
-        if (Rng.NextDouble() < 0.1) dmg = Math.Max(1, dmg - 2);
-
-        return dmg;
-    }
-
-    static void MaybeDropLoot(string enemyName)
-    {
-        // Enkel loot-regel
-        if (Rng.NextDouble() < 0.35)
-        {
-            Item item = new MinorGem();
-            // if (enemyName.Contains("Urdraken")) item = "Dragon Scale";
-
-            player.Inventory.AddItem(item);
-
-            Console.WriteLine($"Föremål hittat: {item.name} (lagt i din väska)");
-        }
+        enemies.Clear();
+        enemies.Add(new Enemy(18, 4, 1, 6, 4, "beast", "Vildsvin", Rng));
+        enemies.Add(new Enemy(20, 5, 2, 7, 5, "Undead", "Skelett", Rng));
+        enemies.Add(new Enemy(16, 6, 1, 8, 6, "bandit", "Bandit", Rng));
+        enemies.Add(new Enemy(14, 3, 0, 5, 3, "slime", "Geléslem", Rng));
     }
 
     // ======= Rumshändelser =======
@@ -333,9 +301,9 @@ class Program
         else
         {
             // var items = new[] { "Iron Dagger", "Oak Staff", "Leather Vest", "Healing Herb" };
-            Item[] items = new[] {new IronDagger() };
+            Item[] items = new[] { new IronDagger() };
             Item found = items[Rng.Next(items.Length)];
-            player.Inventory.AddItem(found);
+            player.AddLoot(found);
             Console.WriteLine($"Du plockar upp: {found.name}");
         }
         return true;
@@ -346,7 +314,7 @@ class Program
         Console.WriteLine("En vandrande köpman erbjuder sina varor:");
         while (true)
         {
-            Console.WriteLine($"Guld: {player.Gold} | Drycker: {player.Potions}");
+            Console.WriteLine($"Guld: {player.GetGold()} | Drycker: {player.Potions}");
             Console.WriteLine("1) Köp dryck (10 guld)");
             Console.WriteLine("2) Köp vapen (+2 Attack) (25 guld)");
             Console.WriteLine("3) Köp rustning (+2 Defense) (25 guld)");
@@ -406,20 +374,5 @@ class Program
         player.Rest();
         Console.WriteLine("HP återställt till max.");
         return true;
-    }
-    
-    // ======= Hjälpmetoder =======
-
-    static int ParseInt(string s, int fallback)
-    {
-        try
-        {
-            int value = Convert.ToInt32(s);
-            return value;
-        }
-        catch (Exception e)
-        {
-            return fallback;
-        }
     }
 }
