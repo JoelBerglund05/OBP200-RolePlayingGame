@@ -1,4 +1,7 @@
 ﻿using System.Text;
+using OBP200_RolePlayingGame.Inventory.InventoryItem;
+using OBP200_RolePlayingGame.Inventory.InventoryItem.Components.ComponentInterfaces;
+using OBP200_RolePlayingGame.Player.PlayableClassTypes;
 
 namespace OBP200_RolePlayingGame;
 
@@ -9,7 +12,7 @@ class Program
 
     // Spelarens "databas": alla värden som strängar
     // index: 0 Name, 1 Class, 2 HP, 3 MaxHP, 4 Attack, 5 Defense, 6 GOLD, 7 XP, 8 LEVEL, 9 POTIONS, 10 INVENTORY (semicolon-sep)
-    private static Player player;
+    private static Player.Player player;
 
     // Rum: [type, label]
     // types: battle, treasure, shop, rest, boss
@@ -307,12 +310,12 @@ class Program
         // Enkel loot-regel
         if (Rng.NextDouble() < 0.35)
         {
-            string item = "Minor Gem";
-            if (enemyName.Contains("Urdraken")) item = "Dragon Scale";
+            Item item = new MinorGem();
+            // if (enemyName.Contains("Urdraken")) item = "Dragon Scale";
 
-            player.AddToInventory(item);
+            player.Inventory.AddItem(item);
 
-            Console.WriteLine($"Föremål hittat: {item} (lagt i din väska)");
+            Console.WriteLine($"Föremål hittat: {item.name} (lagt i din väska)");
         }
     }
 
@@ -329,10 +332,11 @@ class Program
         }
         else
         {
-            var items = new[] { "Iron Dagger", "Oak Staff", "Leather Vest", "Healing Herb" };
-            string found = items[Rng.Next(items.Length)];
-            player.AddToInventory(found);
-            Console.WriteLine($"Du plockar upp: {found}");
+            // var items = new[] { "Iron Dagger", "Oak Staff", "Leather Vest", "Healing Herb" };
+            Item[] items = new[] {new IronDagger() };
+            Item found = items[Rng.Next(items.Length)];
+            player.Inventory.AddItem(found);
+            Console.WriteLine($"Du plockar upp: {found.name}");
         }
         return true;
     }
@@ -353,15 +357,15 @@ class Program
 
             if (val == "1")
             {
-                player.TryBuy(10, Item.Potion, "Du köper en dryck.");
+                player.TryBuy(10, ShopItem.Potion, "Du köper en dryck.");
             }
             else if (val == "2")
             {
-                player.TryBuy(25, Item.Weapon, "Du köper ett bättre vapen.");
+                player.TryBuy(25, ShopItem.Weapon, "Du köper ett bättre vapen.");
             }
             else if (val == "3")
             {
-                player.TryBuy(25, Item.Armor, "Du köper bättre rustning.");
+                player.TryBuy(25, ShopItem.Armor, "Du köper bättre rustning.");
             }
             else if (val == "4")
             {
@@ -382,21 +386,15 @@ class Program
     
     static void SellMinorGems()
     {
-        if (string.IsNullOrWhiteSpace(player.Inventory))
-        {
-            Console.WriteLine("Du har inga föremål att sälja.");
-            return;
-        }
-
-        var items = player.Inventory.Split(';').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-        int count = items.Count(x => x == "Minor Gem");
+        var items = player.Inventory.GetItems<ISellable>();
+        int count = items.Count;
         if (count == 0)
         {
             Console.WriteLine("Inga 'Minor Gem' i väskan.");
             return;
         }
 
-        player.ReplaceInventory(items);
+        count = player.Inventory.RemoveItems<MinorGem>();
 
         player.AddGold(count * 5);
         Console.WriteLine($"Du säljer {count} st Minor Gem för {count * 5} guld.");

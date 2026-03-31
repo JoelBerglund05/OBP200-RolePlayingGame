@@ -1,4 +1,4 @@
-﻿namespace OBP200_RolePlayingGame;
+﻿namespace OBP200_RolePlayingGame.Player;
 
 public abstract class Player
 {
@@ -7,7 +7,7 @@ public abstract class Player
         Name = name;
         Xp = 0;
         Level = 1;
-        Inventory = "Wooden Sword;Cloth Armor";
+        Inventory = new Inventory.Inventory();
     }
 
     public int Defense
@@ -34,7 +34,7 @@ public abstract class Player
         get;
     }
 
-    public string Inventory
+    public Inventory.Inventory Inventory
     {
         protected set;
         get;
@@ -92,7 +92,7 @@ public abstract class Player
     
     protected abstract void MaybeLevelUp();
     
-    public bool TryRunAway( Random Rng)
+    public bool TryRunAway(Random Rng)
     {
         return (Rng.NextDouble() < Chance);
     }
@@ -134,36 +134,24 @@ public abstract class Player
     {
         Gold += Math.Max(0, amount);
     }
-
-    public void AddToInventory(string item)
-    {
-        var inv = (Inventory ?? "").Trim();
-        Inventory = string.IsNullOrEmpty(inv) ? item : (inv + ";" + item);
-    }
-
-    public void ReplaceInventory(List<string> items)
-    {
-        items = items.Where(x => x != "Minor Gem").ToList();
-        Inventory = items.Count == 0 ? "" : string.Join(";", items);
-    }
     
-    public void TryBuy(int cost, Item item, string successMsg)
+    public void TryBuy(int cost, ShopItem shopItem, string successMsg)
     {
         if (Gold >= cost)
         {
             Gold -= cost;
-            switch (item)
+            switch (shopItem)
             {
-                case Item.Potion:
+                case ShopItem.Potion:
                     Potions += 1;
                     break;
-                case Item.Weapon:
+                case ShopItem.Weapon:
                     Attack += 2;
                     break;
-                case Item.Armor:
+                case ShopItem.Armor:
                     Defense += 2;
                     break;
-                Defenseault:
+                Default:
                     break;
             }
             Console.WriteLine(successMsg);
@@ -177,10 +165,7 @@ public abstract class Player
     public void ShowStatus()
     {
         Console.WriteLine($"[{Name} | {ClassType}]  HP {Hp}/{Maxhp}  Attack {Attack}  Defense {Defense}  LVL {Level}  XP {Xp}  Guld {Gold}  Drycker {Potions}");
-        if (!string.IsNullOrWhiteSpace(Inventory))
-        {
-            Console.WriteLine($"Väska: {Inventory}");
-        }
+        Inventory.ViewInventory();
     }
 
     protected int NextLevelThreshold()

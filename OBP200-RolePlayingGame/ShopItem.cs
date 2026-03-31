@@ -1,6 +1,6 @@
 ﻿namespace OBP200_RolePlayingGame;
 
-public enum Item
+public enum ShopItem
 {
     Potion,
     Weapon,

@@ -1,4 +1,4 @@
-﻿namespace OBP200_RolePlayingGame;
+﻿namespace OBP200_RolePlayingGame.Player.PlayableClassTypes;
 
 public class Warrior : Player
 {

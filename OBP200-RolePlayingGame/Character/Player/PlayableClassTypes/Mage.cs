@@ -1,27 +1,28 @@
-﻿namespace OBP200_RolePlayingGame;
+﻿namespace OBP200_RolePlayingGame.Player.PlayableClassTypes;
 
-public class Rogue : Player
+public class Mage : Player
 {
-    public Rogue(string name) : base(name)
+    public Mage(string name) : base(name)
     {
-        Maxhp = 32;
+        Maxhp = 28;
         Hp = Maxhp;
-        Attack = 8;
-        Defense = 3;
-        Potions = 3;
-        Gold = 20;
-        Buff = 0;
-        ClassType = "Rogue";
-        Chance = 0.5;
+        Attack = 10;
+        Defense = 2;
+        Potions = 2;
+        Gold = 15;
+        Buff = 2;
+        ClassType = "Mage";
+        Chance = 0.35;
     }
-
+    
     public override int CalculateDamage(int enemyDefense, Random Rng)
     {
         // Beräkna grundskada
         int baseDmg = Math.Max(1, Attack - (enemyDefense / 2));
         int roll = Rng.Next(0, 3); // liten variation
         
-        baseDmg += (Rng.NextDouble() < 0.2) ? 4 : 0; // rogue crit-chans
+        baseDmg += Buff;
+        
         return Math.Max(1, baseDmg + roll);
     }
 
@@ -29,16 +30,17 @@ public class Rogue : Player
     {
         int specialDmg = 0;
         
-        // Backstab: chans att ignorera försvar, hög risk/hög belöning
-        if (Rng.NextDouble() < 0.5)
+        // Fireball: stor skada, kostar guld
+        if (Gold >= 3)
         {
-            Console.WriteLine("Rogue utför en lyckad Backstab!");
-            specialDmg = Math.Max(4, Attack + 6);
+            Console.WriteLine("Mage kastar Fireball!");
+            Gold -= 3;
+            specialDmg = Math.Max(3, Attack + 5 - (enemyDefense / 2));
         }
         else
         {
-            Console.WriteLine("Backstab misslyckades!");
-            specialDmg = 1;
+            Console.WriteLine("Inte tillräckligt med guld för att kasta Fireball (kostar 3).");
+            specialDmg = 0;
         }
         
         // Dämpa skada mot bossen
@@ -55,7 +57,7 @@ public class Rogue : Player
         if (Xp >= NextLevelThreshold())
         {
             Level++;
-            Maxhp += 5; Attack += 3; Defense += 1;
+            Maxhp += 4; Attack += 4; Defense += 1;
             Console.WriteLine($"Du når nivå {Level}! Värden ökade och HP återställd.");
         }
     }
