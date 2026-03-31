@@ -28,16 +28,18 @@ public class Inventory
 
     public int RemoveItems<T>() where T : Item
     {
-        int count = 0;
-        foreach (var item in items)
+        int count = items.Count;
+        int itemRemoved = 0;
+
+        for (int i = count - 1; i >= 0; i--)
         {
-            if (item.GetType() == typeof(T))
+            if (items[i].GetType() == typeof(T))
             {
-                items.Remove(item);
-                count++;
+                items.Remove(items[i]);
+                itemRemoved++;
             }
         }
-        return count;
+        return itemRemoved;
     }
 
     public List<Item> GetItems<T>() where T : IItemComponent
